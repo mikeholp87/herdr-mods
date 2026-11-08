@@ -10,6 +10,8 @@ A 28px bar (`chrome` bg, top border, 11.8px `muted` text). Left to right: machin
 ## How it behaves
 Reads on start and every 120 s. Tooltips: the window and when it resets; for Claude, when the reading was saved and the token counts.
 
+Clicking the Claude/Codex readout (`Popover`, `anchor("bottom_right")`, controlled `open`) opens a 360px panel (`popover` bg, 1px `border`, radius 10, `shadow_lg`, 14px padding, 16px gap): header "Plan usage limits" with a Refresh text button; a Claude section (8px #D97757 dot, name, "updated N min ago"), rows "Current session (5-hour)" and "Weekly limit (all models)"; a divider; a Codex section (#10A37F dot, "last activity N min ago"), rows "5-hour usage limit" and "Weekly usage limit"; a dim footer line. Each row: label left and "N% used" right, a 6px full-width bar (`border` track, fill `accent`, `working` from 70%, `blocked` from 90%), then "Resets in 43 min" or "Resets Sat 8:00 AM · in 5 d 10 hr" left and "N% left" right. Claude also lists "Today" and "Last 5 hours" token counts with a note that Claude has no daily limit. Clicking outside closes it.
+
 ## Built from
 One mod, `agent-usage`, cloned from `workspace-status` (`mod.clone`), `place: "none"`. `main.js` uses `herdr` (`spaces`, `agents`, `theme`, `run`, `window`, `keys`, `exec`, `home`, `appHome`), `gpui-base` `h_flex`, and `fs/promises`.
 - **Codex**: the newest 8 files under `~/.codex/sessions/Y/M/D`; the match with the latest event timestamp of `"timestamp":"…"` … `"primary":{"used_percent":…,"window_minutes":…,"resets_at":…},"secondary":{…}`. File names are local time and events are UTC, so pick by event timestamp, not by name. A window whose `resets_at` has passed shows 0.

@@ -12,7 +12,8 @@ Your coding agents' plan usage in the Herdr status bar, read from local files. N
 
 - **Codex:** 5-hour and weekly percent used, with small meters, from its session logs.
 - **Claude Code:** 5-hour and weekly percent used (Pro, Max and Ultra plans), saved by a small status line wrapper; falls back to token counts without it.
-- Amber at 70%, red at 90%; hover for reset times.
+- Amber at 70%, red at 90%.
+- Click the readout for a popup in the style of the Claude and Codex usage pages: each limit with percent used and left, a bar and its reset time.
 
 [Install and details](agent-usage/README.md)
 
