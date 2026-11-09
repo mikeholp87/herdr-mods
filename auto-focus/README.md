@@ -1,0 +1,32 @@
+# Herdr Auto Focus
+
+Focus follows the mouse: move the pointer onto a pane and it takes the keyboard. No click needed.
+
+![Auto focus: hovering a pane focuses it](preview.png)
+
+*The image is an illustration, not a screenshot.*
+
+- Hover anywhere in a pane, its header or its terminal, and that pane is focused.
+- A pane that is already focused is left alone, so nothing re-runs while you move around inside it.
+- Keeps the normal pane header: program icon, agent or terminal name, folder, agent status, and the split right, split down, zoom and close buttons on hover.
+
+It is Herdr's shipped `pane` header with a transparent overlay added, so it replaces that header. It uses no network and reads no files.
+
+## Install
+
+1. Copy `mods/hover-focus/` to `~/.config/herdr-app/mods/`.
+2. In your layout, point the pane header at it (the tab block's `pane.header`):
+
+   ```json
+   "header": { "content": { "mod": "hover-focus" }, "height": 30, "position": "top", "reveal": "always" }
+   ```
+3. `herdr-app check ~/.config/herdr-app/mods/hover-focus`, then `layout.switch`.
+
+Keep `"reveal": "always"` and the 30px height: the overlay is positioned from the header's bottom edge. With `"reveal": "hover"` the header would only exist while the pointer is over a pane.
+
+## Limits
+
+- Tested on Herdr 0.1.14 on Linux (KDE Plasma, Wayland). Not tried on macOS or Windows.
+- The overlay is an absolutely positioned element drawn outside the 30px header (8000×8000 px, nothing is clipped). It relies on the app not clipping a header mod to its own box. If a later Herdr version does, hover focus will only work over the header bar.
+- Mods can't see the mouse anywhere else, so this only covers panes of the tab the layout shows.
+- Based on Herdr's shipped `pane` header (0.1.10); it won't follow later changes to it.

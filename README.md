@@ -17,6 +17,17 @@ Your coding agents' plan usage in the Herdr status bar, read from local files. N
 
 [Install and details](agent-usage/README.md)
 
+### [auto-focus](auto-focus/)
+
+![Auto focus: hovering a pane focuses it](auto-focus/preview.png)
+
+Focus follows the mouse. Move the pointer onto a pane and it takes the keyboard, no click needed. Keeps the normal pane header with its split, zoom and close buttons.
+
+- Works anywhere in the pane, not just on the header bar.
+- A drop-in pane header (`hover-focus`): point your layout's `pane.header` at it.
+
+[Install and details](auto-focus/README.md)
+
 ## License
 
 MIT
