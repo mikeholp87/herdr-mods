@@ -27,6 +27,7 @@ Keep `"reveal": "always"` and the 30px height: the overlay is positioned from th
 ## Limits
 
 - Tested on Herdr 0.1.14 on Linux (KDE Plasma, Wayland). Not tried on macOS or Windows.
+- Windows: the mod runs no programs and reads no files, so nothing in it is OS-specific except the folder shown in the header. Windows paths (`C:\Users\you\proj`) are shortened to `~/proj` like Linux and macOS ones, with the drive letter compared without case. That part is unit-tested; the mod has not been run on a Windows machine.
 - The overlay is an absolutely positioned element drawn outside the 30px header (8000×8000 px, nothing is clipped). It relies on the app not clipping a header mod to its own box. If a later Herdr version does, hover focus will only work over the header bar.
 - Mods can't see the mouse anywhere else, so this only covers panes of the tab the layout shows.
 - Based on Herdr's shipped `pane` header (0.1.10); it won't follow later changes to it.

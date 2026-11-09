@@ -12,6 +12,7 @@ Pointer enters a pane's header or terminal and the pane focuses (`pane.focus {pa
 
 ## Built from
 One mod, `hover-focus`, cloned from the shipped `pane` header (`mod.clone`), `place: "none"`. `main.js` uses `herdr` (`panes`, `props`, `run`, `theme`, `home`) and `gpui-kit` (`View`, `div`, `svg`, `image`), `gpui-base` `h_flex`. Its five icons and the spinner are copied into `mods/hover-focus/` so it doesn't depend on other mods' files.
+- `shorten(cwd, home)` (exported so it can be tested): the folder text. Turns `\` into `/`, then shows the home folder as `~` and a path under it as `~/rest`, but only at a path boundary (`/home/me2` is not under `/home/me`). When home starts with a drive letter, the comparison ignores case. Anything else is shown unchanged.
 - `focusMe()`: finds this pane in `panes()` by `props().pane`; if `focused` is false, `run("pane.focus", { pane })`.
 - The header row's `on_hover` calls `focusMe()` when `hovered` is true.
 - The overlay is the last child of the header row: `div().id("hover-focus-<pane>").absolute().top(30).left(0).w(8000).h(8000)` with `on_hover` calling `focusMe()`. No background, so it is invisible.
@@ -22,6 +23,8 @@ One mod, `hover-focus`, cloned from the shipped `pane` header (`mod.clone`), `pl
 - A header with a tall `height` and `reveal: "always"` does not work as an overlay: it takes the pane's space and hides the terminal. `reveal: "hover"` draws it over the terminal but then the bar is hidden until hovered. The absolute child of a normal 30px header is what gives both.
 - The overlay has no background and no `occlude`; adding either is untested and may block clicks to the terminal.
 - Hover is the only trigger; there is no delay, so a fast pointer sweep across panes will focus each in turn.
+
+- Windows: header text uses `/` after `~` (`~/proj`) even though the OS uses `\`. The mod itself has no `exec`, file or shell use, so there is no other OS-specific path.
 
 ## Done when
 `herdr-app check mods/hover-focus` passes and `herdr-app status` shows no errors after `layout.switch`; each pane shows its header with the icon, name and folder; moving the pointer, without clicking, over the middle of another pane moves the focus border to it and `focused_pane` in `herdr-app status` changes; the buttons on hover still split, zoom and close.

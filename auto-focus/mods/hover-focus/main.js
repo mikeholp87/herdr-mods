@@ -15,10 +15,20 @@ function icon(p, size, color) {
   return p.tint ? svg(p.icon).size(size).flex_none().text_color(color) : image(p.icon).w(size).h(size).flex_none();
 }
 
-function folder(cwd) {
+// Home shortened to "~". Windows paths use backslashes and compare without case (C:\Users\me\app becomes ~/app).
+export function shorten(cwd, h) {
   if (!cwd) return "";
-  const h = home();
-  return cwd === h ? "~" : cwd.startsWith(h + "/") ? "~" + cwd.slice(h.length) : cwd;
+  const slash = (s) => s.replace(/\\/g, "/");
+  const c = slash(cwd);
+  const base = slash(h || "").replace(/\/+$/, "");
+  if (!base) return cwd;
+  const same = /^[A-Za-z]:/.test(base) ? (a, b) => a.toLowerCase() === b.toLowerCase() : (a, b) => a === b;
+  if (same(c, base)) return "~";
+  return c.length > base.length && same(c.slice(0, base.length + 1), base + "/") ? "~" + c.slice(base.length) : cwd;
+}
+
+function folder(cwd) {
+  return shorten(cwd, home());
 }
 
 export default class Pane extends View {
