@@ -2,7 +2,7 @@
 // Click them for a panel in the style of the Claude and Codex usage pages: each limit with its
 // percent used and left, a bar and its reset time, plus Claude's token counts. Everything is read
 // from local files; no network, no tokens. Codex: the newest rate_limits its sessions logged.
-// Claude: the limits saved by statusline-herdr.cjs, and usage.ps1 for token counts.
+// Claude: the limits saved by statusline-herdr.cjs, and a scan of ~/.claude/projects for token counts (usage.ps1 on Windows, find + JS elsewhere).
 import { View, div, svg } from "gpui-kit";
 import { h_flex, v_flex, Popover } from "gpui-base";
 import { spaces, agents, theme, run, window, keys, exec, home, appHome } from "herdr";
@@ -48,11 +48,45 @@ async function claudeLimits() {
   return windows.length ? { windows, at: d.at } : null;
 }
 
+// Token counts (input + output + cache creation, deduped by message id) from ~/.claude/projects.
+// Windows runs usage.ps1; Linux and macOS scan in JS, with find doing the mtime filter
+// (fs.readdir has no mtimes).
 async function claudeTokens() {
   const lim = await claudeLimits().catch(() => null);
-  const r = await exec("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", `${appHome()}/mods/agent-usage/usage.ps1`]);
-  if (r.code !== 0) return { error: (r.stderr || "failed").trim().slice(0, 80), limits: lim };
-  return { ...JSON.parse(r.stdout.trim()), limits: lim };
+  if (window().platform === "windows") {
+    const r = await exec("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", `${appHome()}/mods/agent-usage/usage.ps1`]);
+    if (r.code !== 0) return { error: (r.stderr || "failed").trim().slice(0, 80), limits: lim };
+    return { ...JSON.parse(r.stdout.trim()), limits: lim };
+  }
+  try {
+    const now = Date.now();
+    const since5 = now - 5 * 3600e3;
+    const midnight = new Date().setHours(0, 0, 0, 0);
+    const oldest = Math.min(since5, midnight);
+    const mins = Math.ceil((now - oldest) / 60000) + 1;
+    const r = await exec("find", [`${home()}/.claude/projects`, "-name", "*.jsonl", "-type", "f", "-mmin", `-${mins}`]);
+    if (r.code !== 0 && !r.stdout) return { error: (r.stderr || "find failed").trim().slice(0, 80), limits: lim };
+    const seen = new Set();
+    let h5 = 0, day = 0, first5 = null;
+    for (const f of r.stdout.split("\n").filter(Boolean)) {
+      let text;
+      try { text = await fs.readFile(f, "utf8"); } catch { continue; }
+      for (const line of text.split("\n")) {
+        if (!line.includes('"usage"') || !line.includes('"type":"assistant"')) continue;
+        let j;
+        try { j = JSON.parse(line); } catch { continue; }
+        const u = j.message?.usage, id = j.message?.id, t = Date.parse(j.timestamp);
+        if (!u || !Number.isFinite(t)) continue;
+        if (id) { if (seen.has(id)) continue; seen.add(id); }
+        const n = (u.input_tokens || 0) + (u.output_tokens || 0) + (u.cache_creation_input_tokens || 0);
+        if (t >= midnight) day += n;
+        if (t >= since5) { h5 += n; if (first5 === null || t < first5) first5 = t; }
+      }
+    }
+    return { h5, day, first5: first5 === null ? null : new Date(first5).toISOString(), limits: lim };
+  } catch (e) {
+    return { error: String(e?.message || e).slice(0, 80), limits: lim };
+  }
 }
 
 const compact = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}k` : String(n));

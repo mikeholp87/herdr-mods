@@ -39,6 +39,6 @@ The wrapper writes `~/.config/herdr-app/data/agent-usage/claude-limits.json` whe
 
 ## Limits
 
-- The token fallback (`usage.ps1`) is PowerShell, so it is Windows only. The Claude percentages and Codex work anywhere.
+- Works on Windows, Linux and macOS. The mod picks the token-fallback method itself (`window().platform`): PowerShell (`usage.ps1`) on Windows, `find` plus JS on Linux and macOS, so there is nothing OS-specific to install. Linux and macOS need `find` on the PATH.
 - Codex shows its last logged event, so it lags until Codex runs again.
 - Based on Herdr's shipped `workspace-status` (0.1.13); it won't follow later changes to it.
