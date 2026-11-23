@@ -1,5 +1,7 @@
 # Herdr mods
 
+[![License](https://img.shields.io/github/license/mikeholp87/herdr-mods)](https://github.com/mikeholp87/herdr-mods/blob/main/LICENSE)
+
 Custom mods for the [Herdr](https://herdr.dev) desktop app. Each mod is a folder you can copy into `~/.config/herdr-app/`, with its own `README.md`, `RECIPE.md` and `preview.png`.
 
 ## Mods
